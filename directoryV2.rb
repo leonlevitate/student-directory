@@ -10,7 +10,7 @@ def input_students
     @students << {
       name: name,
       cohort: valid_cohort?(get_cohort),
-      country: :"Evil Land",
+      country: :"UK",
       hobbies: :Badminton
     }
     #adding variable statement for single student:
@@ -21,6 +21,9 @@ def input_students
     end
     #gets another name from the user
     name = STDIN.gets.chomp
+  end
+  if @students.empty?
+    input_students
   end
 end
 
@@ -55,8 +58,8 @@ end
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
+  puts "3. Save the list of students to a file"
+  puts "4. Load the list of students from a file"
   puts "5. Choose a cohort to view"
   puts "9. Exit"
 end
@@ -69,14 +72,17 @@ end
 
 def save_students
   #open the file for writing
-  file = File.open("students.csv", "w")
+  puts "Type file name to save to, or hit enter to save to default file:"
+  input_save_file = STDIN.gets.chomp
+  input_save_file.empty? ? file = File.open("students.csv", "w") : file = File.open(input_save_file, "w") do |file|
   #iterate over the array of save_students
-  @students.each do |student|
-  student_data = [student[:name], student[:cohort]]
-  csv_line = student_data.join(",")
-  file.puts csv_line
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+    end
   end
-  file.close
+  puts "Students have been saved successfully!"
 end
 
 def try_load_students
@@ -93,12 +99,15 @@ end
 #load_students will load from students.csv by default
 #load_students(list.txt) will load from list.txt
 def load_students(filename = "students.csv")
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(",")
-    @students << {name: name, cohort: cohort.to_sym}
+  puts "Enter file name to open:"
+  input_file = STDIN.gets.chomp
+  input_file.empty? ? file = File.open(filename, "r") : file = File.open(input_file, "r") do |file|
+    file.readlines.each do |line|
+      name, cohort = line.chomp.split(",")
+      @students << {name: name, cohort: cohort.to_sym}
+    end
   end
-  file.close
+  puts "Your students have been loaded succesfully!"
 end
 
 def process(selection)
